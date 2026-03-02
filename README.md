@@ -21,6 +21,7 @@ Dataset source:
 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
 Raw CSV files are not stored in this repository.
+Raw CSV files are excluded from version control (see .gitignore)
 
 ## Project Structure
 
