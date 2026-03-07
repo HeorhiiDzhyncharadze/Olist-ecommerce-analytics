@@ -1,17 +1,20 @@
 -- =========================================================
 -- Revenue by Product Category
+--
 -- Purpose:
---   Analyze total item-level revenue by product category
+-- Analyze total item-level revenue by product category.
+--
 -- Grain of source data:
---   1 row = 1 order item
+-- 1 row = 1 order item
+--
 -- Notes:
---   Revenue is calculated using item price, not payment_value,
---   to avoid duplication caused by multiple payment rows per order.
+-- Revenue is calculated using item price (not payment_value)
+-- to avoid duplication caused by multiple payment rows per order.
 -- =========================================================
+
 
 WITH order_items_enriched AS (
     SELECT
-        oi.order_id,
         oi.product_id,
         oi.price,
 
@@ -25,11 +28,11 @@ WITH order_items_enriched AS (
 
     -- Join products to get category information
     JOIN olist.olist_products_dataset p
-        ON oi.product_id = p.product_id
+        USING (product_id)
 
     -- Join translation table to make categories readable in English
     LEFT JOIN olist.product_category_name_translation t
-        ON p.product_category_name = t.product_category_name
+        USING (product_category_name)
 )
 
 SELECT
