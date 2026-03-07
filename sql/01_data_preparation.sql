@@ -4,14 +4,15 @@
 -- Purpose:
 -- Prepare core tables for analysis:
 -- - validate schema and column types
--- - convert text date fields into timestamp format
+-- - convert raw purchase datetime text into timestamp format
 -- - perform basic data quality checks
+-- - validate table grain before joins
 -- =========================================================
 
 
 -- ---------------------------------------------------------
 -- Query 1
--- Check column types in the orders table
+-- Check source and cleaned purchase timestamp columns
 -- ---------------------------------------------------------
 SELECT
     column_name,
@@ -27,12 +28,12 @@ WHERE table_schema = 'olist'
 -- Add a clean timestamp column for purchase datetime
 -- ---------------------------------------------------------
 ALTER TABLE olist.olist_orders_dataset
-ADD COLUMN IF NOT EXISTS order_purchase_ts timestamp;
+ADD COLUMN IF NOT EXISTS order_purchase_ts timestamp without time zone;
 
 
 -- ---------------------------------------------------------
 -- Query 3
--- Populate the timestamp column from the raw text field
+-- Populate the cleaned timestamp column from the raw text field
 -- ---------------------------------------------------------
 UPDATE olist.olist_orders_dataset
 SET order_purchase_ts = NULLIF(order_purchase_timestamp, '')::timestamp
@@ -41,7 +42,7 @@ WHERE order_purchase_ts IS NULL;
 
 -- ---------------------------------------------------------
 -- Query 4
--- Validate that conversion was successful
+-- Validate that timestamp conversion was successful
 -- ---------------------------------------------------------
 SELECT
     COUNT(*) AS total_rows,
@@ -59,7 +60,7 @@ FROM olist.olist_orders_dataset;
 -- ---------------------------------------------------------
 SELECT
     COUNT(*) AS total_rows,
-    COUNT(DISTINCT order_id) AS distinct_orders
+    COUNT(DISTINCT order_id) AS distinct_orders_cnt
 FROM olist.olist_orders_dataset;
 
 
@@ -68,12 +69,12 @@ FROM olist.olist_orders_dataset;
 -- Grain check: order_items table
 --
 -- Expected grain:
--- 1 row = 1 product inside an order
+-- 1 row = 1 order item
 -- Multiple rows per order_id are expected
 -- ---------------------------------------------------------
 SELECT
     COUNT(*) AS total_rows,
-    COUNT(DISTINCT order_id) AS distinct_orders
+    COUNT(DISTINCT order_id) AS distinct_orders_cnt
 FROM olist.olist_order_items_dataset;
 
 
@@ -82,10 +83,10 @@ FROM olist.olist_order_items_dataset;
 -- Grain check: order_payments table
 --
 -- Expected grain:
--- 1 row = 1 payment record
--- Orders may have multiple payments
+-- 1 row = 1 payment record or installment
+-- Multiple rows per order_id are expected
 -- ---------------------------------------------------------
 SELECT
     COUNT(*) AS total_rows,
-    COUNT(DISTINCT order_id) AS distinct_orders
+    COUNT(DISTINCT order_id) AS distinct_orders_cnt
 FROM olist.olist_order_payments_dataset;
