@@ -1,6 +1,5 @@
 ---
 
-# Project Structure
 # Olist E-commerce SQL Analysis
 
 This project analyzes the performance of a real Brazilian e-commerce marketplace using SQL.  
@@ -9,7 +8,6 @@ The goal is to understand how the business performs across orders, products, cus
 The analysis covers core business areas including revenue trends, customer behavior, product performance, retention, and delivery reliability.
 
 The project is built entirely in SQL using PostgreSQL and is structured as a set of analytical queries that answer common business questions in an e-commerce environment.
-
 
 ---
 
@@ -32,36 +30,32 @@ The dataset represents a real online marketplace and allows analysis across the 
 Source:  
 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 
+## Project Structure
 
----
-
-# Project Structure
-
+```
 olist-analytics/
 │
 ├── sql/
-│ ├── 01_data_preparation.sql
-│ ├── 02_monthly_kpis.sql
-│ ├── 03_revenue_by_category.sql
-│ ├── 04_category_share.sql
-│ ├── 05_category_trend.sql
-│ ├── 06_product_analysis.sql
-│ ├── 07_customer_analysis.sql
-│ ├── 08_cohort_analysis.sql
-│ └── 09_delivery_analysis.sql
+│   ├── 01_data_preparation.sql
+│   ├── 02_monthly_kpis.sql
+│   ├── 03_revenue_by_category.sql
+│   ├── 04_category_share.sql
+│   ├── 05_category_trend.sql
+│   ├── 06_product_analysis.sql
+│   ├── 07_customer_analysis.sql
+│   ├── 08_cohort_analysis.sql
+│   └── 09_delivery_analysis.sql
 │
 ├── docs/
-│ └── project_notes.md
+│   └── project_notes.md
 │
 ├── notebooks/
-│ └── exploratory_analysis.ipynb
+│   └── exploratory_analysis.ipynb
 │
 └── README.md
-
-
+```
 
 Each SQL file focuses on a specific business topic and can be executed independently.
-
 
 ---
 
@@ -92,7 +86,6 @@ The project answers several practical questions that an e-commerce company would
 - What percentage of deliveries arrive late?
 - How severe are delivery delays?
 
-
 ---
 
 # Methods and Techniques
@@ -116,6 +109,40 @@ Examples include:
 - **cohort retention analysis** to measure customer return behavior  
 - **delivery performance analysis** to evaluate logistics reliability
 
+## Key Skills Demonstrated
+
+This project demonstrates practical data analysis skills commonly required for Data Analyst roles.
+
+**SQL Data Analysis**
+
+- Writing complex analytical SQL queries
+- Working with multi-table joins across transactional datasets
+- Aggregating data at different business grains (order, customer, product)
+
+**Business Metrics Analysis**
+
+- Revenue and order KPI analysis
+- Average order value calculation
+- Basket size and order composition analysis
+
+**Customer Analytics**
+
+- Customer segmentation (one-time vs repeat customers)
+- Customer lifetime revenue estimation
+- Cohort-based retention analysis
+
+**Advanced SQL Techniques**
+
+- Window functions for cumulative metrics
+- Cohort index calculation
+- Pivot-style retention matrices
+- Pareto analysis (80/20 revenue distribution)
+
+**Operational Analytics**
+
+- Delivery time analysis
+- Late delivery rate calculation
+- Logistics performance evaluation
 
 ---
 
