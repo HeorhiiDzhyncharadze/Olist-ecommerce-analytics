@@ -1,48 +1,69 @@
 -- =========================================================
--- Revenue by Product Category
+-- Monthly Business KPIs
 --
 -- Purpose:
--- Analyze total item-level revenue by product category.
+-- Analyze core business performance metrics by month.
+--
+-- Metrics calculated:
+-- - total orders
+-- - total revenue (GMV)
+-- - average order value (AOV)
 --
 -- Grain of source data:
--- 1 row = 1 order item
---
--- Notes:
--- Revenue is calculated using item price (not payment_value)
--- to avoid duplication caused by multiple payment rows per order.
+-- orders table = 1 row per order
+-- order_items table = 1 row per order item
 -- =========================================================
 
 
-WITH order_items_enriched AS (
+-- ---------------------------------------------------------
+-- Step 1: Prepare delivered orders
+-- ---------------------------------------------------------
+WITH delivered_orders AS (
+
     SELECT
-        oi.product_id,
-        oi.price,
+        order_id,
+        date_trunc('month', order_purchase_ts) AS order_month
 
-        -- Original category name in Portuguese
-        p.product_category_name,
+    FROM olist.olist_orders_dataset
 
-        -- English category name for reporting
-        t.product_category_name_english
+    WHERE order_status = 'delivered'
+),
 
-    FROM olist.olist_order_items_dataset oi
 
-    -- Join products to get category information
-    JOIN olist.olist_products_dataset p
-        USING (product_id)
+-- ---------------------------------------------------------
+-- Step 2: Calculate revenue per order
+-- ---------------------------------------------------------
+order_revenue AS (
 
-    -- Join translation table to make categories readable in English
-    LEFT JOIN olist.product_category_name_translation t
-        USING (product_category_name)
+    SELECT
+        order_id,
+        SUM(price) AS order_revenue
+
+    FROM olist.olist_order_items_dataset
+
+    GROUP BY order_id
 )
 
+
+-- ---------------------------------------------------------
+-- Step 3: Monthly KPI aggregation
+-- ---------------------------------------------------------
 SELECT
-    -- Replace NULL category names with 'unknown' for reporting clarity
-    COALESCE(product_category_name_english, 'unknown') AS category,
+    d.order_month,
 
-    -- Total item-level revenue by category
-    SUM(price) AS total_revenue
+    -- Number of delivered orders
+    COUNT(DISTINCT d.order_id) AS orders_cnt,
 
-FROM order_items_enriched
+    -- Total revenue
+    SUM(r.order_revenue) AS total_revenue,
 
-GROUP BY COALESCE(product_category_name_english, 'unknown')
-ORDER BY total_revenue DESC;
+    -- Average order value
+    ROUND(SUM(r.order_revenue) / COUNT(DISTINCT d.order_id), 2) AS avg_order_value
+
+FROM delivered_orders d
+
+JOIN order_revenue r
+    USING (order_id)
+
+GROUP BY d.order_month
+ORDER BY d.order_month;
