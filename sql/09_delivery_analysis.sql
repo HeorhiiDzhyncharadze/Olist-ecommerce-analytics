@@ -11,32 +11,24 @@
 -- =========================================================
 
 
-
 -- ---------------------------------------------------------
 -- Query 9.1
--- Delivery time per order
+-- Delivery time analysis
 --
 -- Metric:
 -- delivery_days =
--- order_delivered_customer_date - order_purchase_ts
+-- actual_delivery_date - purchase_date
 --
--- Only delivered orders are used
+-- Only delivered orders are included
 -- ---------------------------------------------------------
 
 WITH order_delivery_days AS (
     SELECT
-        order_id,
-        order_purchase_ts,
-
-        NULLIF(order_delivered_customer_date, '')::timestamp AS delivery_date,
-
         DATE_PART(
             'day',
             NULLIF(order_delivered_customer_date, '')::timestamp
             - order_purchase_ts
-        )::numeric AS delivery_days,
-
-        order_status
+        )::numeric AS delivery_days
 
     FROM olist.olist_orders_dataset
 
@@ -65,7 +57,8 @@ SELECT
 
     SUM(
         CASE
-            WHEN order_delivered_customer_date > order_estimated_delivery_date
+            WHEN NULLIF(order_delivered_customer_date, '')::timestamp
+               > NULLIF(order_estimated_delivery_date, '')::timestamp
             THEN 1
             ELSE 0
         END
@@ -74,20 +67,21 @@ SELECT
     ROUND(
         SUM(
             CASE
-                WHEN order_delivered_customer_date > order_estimated_delivery_date
+                WHEN NULLIF(order_delivered_customer_date, '')::timestamp
+                   > NULLIF(order_estimated_delivery_date, '')::timestamp
                 THEN 1
                 ELSE 0
             END
         )::numeric
         / COUNT(order_id),
-        2
+        4
     ) AS late_delivery_rate
 
 FROM olist.olist_orders_dataset
 
 WHERE order_status = 'delivered'
-  AND order_delivered_customer_date IS NOT NULL
-  AND order_estimated_delivery_date IS NOT NULL;
+  AND NULLIF(order_delivered_customer_date, '') IS NOT NULL
+  AND NULLIF(order_estimated_delivery_date, '') IS NOT NULL;
 
 
 
@@ -95,6 +89,7 @@ WHERE order_status = 'delivered'
 -- Query 9.3
 -- Delay severity analysis
 --
+-- Metric:
 -- delay_days =
 -- actual_delivery_date - estimated_delivery_date
 --
@@ -103,27 +98,19 @@ WHERE order_status = 'delivered'
 
 WITH order_delay_days AS (
     SELECT
-        order_id,
-
-        NULLIF(order_delivered_customer_date, '')::timestamp AS delivery_date,
-
-        NULLIF(order_estimated_delivery_date, '')::timestamp AS estimated_date,
-
         DATE_PART(
             'day',
             NULLIF(order_delivered_customer_date, '')::timestamp
-            -
-            NULLIF(order_estimated_delivery_date, '')::timestamp
-        )::numeric AS delay_days,
-
-        order_status
+            - NULLIF(order_estimated_delivery_date, '')::timestamp
+        )::numeric AS delay_days
 
     FROM olist.olist_orders_dataset
 
     WHERE order_status = 'delivered'
       AND NULLIF(order_delivered_customer_date, '') IS NOT NULL
       AND NULLIF(order_estimated_delivery_date, '') IS NOT NULL
-      AND order_delivered_customer_date > order_estimated_delivery_date
+      AND NULLIF(order_delivered_customer_date, '')::timestamp
+          > NULLIF(order_estimated_delivery_date, '')::timestamp
 )
 
 SELECT
