@@ -36,41 +36,6 @@ https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
 ---
 
 # Project Structure
-# Olist E-commerce SQL Analysis
-
-This project analyzes the performance of a real Brazilian e-commerce marketplace using SQL.  
-The goal is to understand how the business performs across orders, products, customers, and logistics, and to extract insights that could help improve growth and operational efficiency.
-
-The analysis covers core business areas including revenue trends, customer behavior, product performance, retention, and delivery reliability.
-
-The project is built entirely in SQL using PostgreSQL and is structured as a set of analytical queries that answer common business questions in an e-commerce environment.
-
-
----
-
-# Dataset
-
-The analysis uses the **Olist E-commerce dataset**, a public dataset that contains detailed order, product, payment, customer, and delivery information.
-
-The dataset includes:
-
-- ~100k orders
-- ~300k order items
-- ~90k customers
-- product catalog and category translations
-- delivery and logistics timestamps
-
-The dataset represents a real online marketplace and allows analysis across the full e-commerce lifecycle:
-
-**customer → order → product → delivery**
-
-Source:  
-https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
-
-
----
-
-# Project Structure
 
 olist-analytics/
 │
