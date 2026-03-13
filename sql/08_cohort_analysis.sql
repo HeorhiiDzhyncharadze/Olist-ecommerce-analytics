@@ -29,20 +29,23 @@
 
 WITH customer_orders AS (
     SELECT
-        ocd.customer_unique_id,
+        c.customer_unique_id,
 
         -- Purchase month of each delivered order
-        DATE_TRUNC('month', ood.order_purchase_ts) AS order_month
+        DATE_TRUNC('month', o.order_purchase_ts) AS order_month
 
-    FROM olist.olist_orders_dataset ood
-    JOIN olist.olist_customers_dataset ocd
+    FROM olist.olist_orders_dataset o
+
+    JOIN olist.olist_customers_dataset c
         USING (customer_id)
 
     -- Keep only delivered orders
-    WHERE ood.order_status = 'delivered'
+    WHERE o.order_status = 'delivered'
 
     -- Deduplicate at customer-month level
-    GROUP BY ocd.customer_unique_id, DATE_TRUNC('month', ood.order_purchase_ts)
+    GROUP BY
+        c.customer_unique_id,
+        order_month
 ),
 
 first_orders AS (
