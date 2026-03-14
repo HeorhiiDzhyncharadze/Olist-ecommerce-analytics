@@ -5,14 +5,16 @@ CREATE VIEW olist.vw_delivery_analysis AS
 SELECT
     order_id,
     customer_id,
+
     order_purchase_ts::date AS purchase_date,
-    order_delivered_customer_date::date AS delivered_date,
-    order_estimated_delivery_date::date AS estimated_delivery_date,
+
+    order_delivered_customer_date::timestamp::date AS delivered_date,
+    order_estimated_delivery_date::timestamp::date AS estimated_delivery_date,
 
     ROUND(
         DATE_PART(
             'day',
-            order_delivered_customer_date - order_purchase_ts
+            order_delivered_customer_date::timestamp - order_purchase_ts
         )::numeric,
         2
     ) AS delivery_days,
@@ -20,13 +22,16 @@ SELECT
     ROUND(
         DATE_PART(
             'day',
-            order_delivered_customer_date - order_estimated_delivery_date
+            order_delivered_customer_date::timestamp
+            - order_estimated_delivery_date::timestamp
         )::numeric,
         2
     ) AS delay_days,
 
     CASE
-        WHEN order_delivered_customer_date > order_estimated_delivery_date THEN 1
+        WHEN order_delivered_customer_date::timestamp
+             > order_estimated_delivery_date::timestamp
+        THEN 1
         ELSE 0
     END AS is_late
 
